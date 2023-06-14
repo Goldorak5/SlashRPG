@@ -288,7 +288,6 @@ bool ASlashCharactere::CanDisarm()
 
 void ASlashCharactere::Equip()
 {
-	/*AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlapingItem);*/
 	ATwoHandedSword* OverlappingTwoHandSword = Cast<ATwoHandedSword>(OverlapingItem);
 	AOneHandedSword* OverlappingOneHandSword = Cast<AOneHandedSword>(OverlapingItem);
 	
@@ -298,12 +297,7 @@ void ASlashCharactere::Equip()
 		{
 			EquipWeapon->Destroy();
 		}
-	OverlappingOneHandSword->Equip(GetMesh(), OverlappingOneHandSword->GetSocketName(), this, this);
-	CharacterState = OverlappingOneHandSword->GetCharacterState();
-	OverlapingItem = nullptr;
-	EquipWeapon = OverlappingOneHandSword;
-	IsEquipOneHand = true;
-	IsEquipedTwoHand = false;
+		EquippingOneHandSword(OverlappingOneHandSword);
 	}
 	else if (OverlappingTwoHandSword)
 	{
@@ -311,12 +305,7 @@ void ASlashCharactere::Equip()
 		{
 			EquipWeapon->Destroy();
 		}
-	OverlappingTwoHandSword->Equip(GetMesh(), OverlappingTwoHandSword->GetSocketName(), this, this);
-	CharacterState = OverlappingTwoHandSword->GetCharacterState();
-	OverlapingItem = nullptr;
-	EquipWeapon = OverlappingTwoHandSword;
-	IsEquipedTwoHand = true;
-	IsEquipOneHand = false;
+		EquippingTwoHandSword(OverlappingTwoHandSword);
 	}
 	else
 	{
@@ -353,6 +342,26 @@ void ASlashCharactere::Equip()
 	}
 }
 
+void ASlashCharactere::EquippingTwoHandSword(ATwoHandedSword*& OverlappingTwoHandSword)
+{
+	OverlappingTwoHandSword->Equip(GetMesh(), OverlappingTwoHandSword->GetSocketName(), this, this);
+	CharacterState = OverlappingTwoHandSword->GetCharacterState();
+	OverlapingItem = nullptr;
+	EquipWeapon = OverlappingTwoHandSword;
+	IsEquipedTwoHand = true;
+	IsEquipOneHand = false;
+}
+
+void ASlashCharactere::EquippingOneHandSword(AOneHandedSword*& OverlappingOneHandSword)
+{
+	OverlappingOneHandSword->Equip(GetMesh(), OverlappingOneHandSword->GetSocketName(), this, this);
+	CharacterState = OverlappingOneHandSword->GetCharacterState();
+	OverlapingItem = nullptr;
+	EquipWeapon = OverlappingOneHandSword;
+	IsEquipOneHand = true;
+	IsEquipedTwoHand = false;
+}
+
 void ASlashCharactere::EquipEnd()
 {
 	ActionState = EActionState::EAS_Unoccupied;
@@ -382,9 +391,6 @@ void ASlashCharactere::AttacheWeaponToTheHand()
 	}
 }
 
-
-
-// Called to bind functionality to input
 void ASlashCharactere::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);

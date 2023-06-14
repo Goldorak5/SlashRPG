@@ -92,6 +92,10 @@ protected:
 	void Look(const FInputActionValue& Value);
 	void Equip();
 
+	void EquippingTwoHandSword(ATwoHandedSword*& OverlappingTwoHandSword);
+
+	void EquippingOneHandSword(AOneHandedSword*& OverlappingOneHandSword);
+
 	/* Montage Function */
 	void PlayEquipMontage(const FName& SectionName);
 	void PlayAttackMontageTwoHand(int32& Select);
