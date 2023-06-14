@@ -130,10 +130,6 @@ void ABaseCharacter::StopAttackMontage()
 
 void ABaseCharacter::PlayDodgeMontage()
 {
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Red, TEXT("Dodge"));
-	}
 	UAnimInstance* Animinstance = GetMesh()->GetAnimInstance();
 
 	if (Animinstance)
