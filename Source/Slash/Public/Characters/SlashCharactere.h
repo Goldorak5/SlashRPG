@@ -106,6 +106,7 @@ protected:
 	virtual void AttackEnd() override;
 	virtual void DodgeEnd() override;
 	virtual bool CanAttack() override;
+	//Death is in hit_implementation in the base_character
 	virtual void Die_Implementation() override;
 	/* <ABaseCharacter> */
 

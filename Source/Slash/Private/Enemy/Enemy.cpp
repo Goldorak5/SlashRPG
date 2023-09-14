@@ -105,7 +105,7 @@ AActor* AEnemy::ChosePatrolTarget()
 	}
 	return nullptr;
 }
-//fire frequently
+
 void AEnemy::PawnSee(APawn* SeenPawn)
 {
 	const bool bShouldChaseTarget =

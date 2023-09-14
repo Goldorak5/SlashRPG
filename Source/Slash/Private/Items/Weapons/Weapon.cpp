@@ -122,7 +122,7 @@ void AWeapon::BoxTrace(FHitResult& BoxHit)
 		ETraceTypeQuery::TraceTypeQuery1,
 		false,
 		ActorsToIgnore,
-		bShowBoxDebug ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None,//default 5 seconds
+		bShowBoxDebug ? EDrawDebugTrace::ForDuration: EDrawDebugTrace::None,//default 5 seconds
 		BoxHit,
 		true);
 	IgnoreActors.AddUnique(BoxHit.GetActor());

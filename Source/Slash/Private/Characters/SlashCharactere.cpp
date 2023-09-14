@@ -58,7 +58,6 @@ ASlashCharactere::ASlashCharactere()
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 }
 
-
 void ASlashCharactere::BeginPlay()
 {
 	Super::BeginPlay();
@@ -111,6 +110,33 @@ void ASlashCharactere::AddMappingContext()
 		}
 	}
 }
+
+void ASlashCharactere::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	if (UEnhancedInputComponent* EnhancePlayerComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		//Moving
+		EnhancePlayerComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &ASlashCharactere::Move);
+		
+		//Looking
+		EnhancePlayerComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASlashCharactere::Look);
+
+		//jump
+		EnhancePlayerComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ASlashCharactere::Jump);
+
+		//Equip
+		EnhancePlayerComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ASlashCharactere::Equip);
+	
+		//Attack
+		EnhancePlayerComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ASlashCharactere::Attack);
+		
+		//Dodge
+		EnhancePlayerComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ASlashCharactere::Dodge);
+		}
+}
+
 void ASlashCharactere::Move(const FInputActionValue& Value)
 {
 	const FVector2D MovementVector = Value.Get<FVector2D>();
@@ -151,11 +177,6 @@ void ASlashCharactere::Jump()
 	}
 }
 
-bool ASlashCharactere::IsUnoccupied()
-{
-	return ActionState == EActionState::EAS_Unoccupied;
-}
-
 void ASlashCharactere::Attack()
 {
 	if (CanAttack() && IsEquipOneHand)
@@ -169,6 +190,7 @@ void ASlashCharactere::Attack()
 		ActionState = EActionState::EAS_Attacking;
 	}
 }
+
 void ASlashCharactere::Dodge()
 {
 	if (!IsUnoccupied() || !HasEnoughStamina())return;
@@ -182,6 +204,111 @@ void ASlashCharactere::Dodge()
 	}
 	ActionState = EActionState::EAS_Dodge;
 	PlayDodgeMontage();
+}
+
+void ASlashCharactere::Equip()
+{
+	ATwoHandedSword* OverlappingTwoHandSword = Cast<ATwoHandedSword>(OverlapingItem);
+	AOneHandedSword* OverlappingOneHandSword = Cast<AOneHandedSword>(OverlapingItem);
+	
+	if (OverlappingOneHandSword)
+	{
+		if (EquipWeapon)
+		{
+			EquipWeapon->Destroy();
+		}
+		EquippingOneHandSword(OverlappingOneHandSword);
+	}
+	else if (OverlappingTwoHandSword)
+	{
+		if (EquipWeapon)
+		{
+			EquipWeapon->Destroy();
+		}
+		EquippingTwoHandSword(OverlappingTwoHandSword);
+	}
+	else
+	{
+		if (CanDisarm())
+		{
+			if (IsEquipOneHand)
+			{
+				PlayEquipMontage(FName("Unequip"));
+				CharacterState = ECharacterState::ECS_UnEquipped;
+				ActionState = EActionState::EAS_Equiping;
+			}
+			else if (IsEquipedTwoHand)
+			{
+				PlayEquipMontageTwoHand(FName("Unequip"));
+				CharacterState = ECharacterState::ECS_UnEquipped;
+				ActionState = EActionState::EAS_Equiping;
+			}
+		}
+		else if (CanArm())
+		{
+			if (IsEquipOneHand)
+			{
+				PlayEquipMontage(FName("Equip"));
+				CharacterState = ECharacterState::ECS_EquipOneHandWeapon;
+				ActionState = EActionState::EAS_Equiping;
+			}
+			else if(IsEquipedTwoHand)
+			{
+				PlayEquipMontageTwoHand(FName("Equip"));
+				CharacterState = ECharacterState::ECS_EquipTwoHAndWeapon;
+				ActionState = EActionState::EAS_Equiping;
+			}
+		}
+	}
+}
+
+void ASlashCharactere::EquippingTwoHandSword(ATwoHandedSword*& OverlappingTwoHandSword)
+{
+	OverlappingTwoHandSword->Equip(GetMesh(), OverlappingTwoHandSword->GetSocketName(), this, this);
+	CharacterState = OverlappingTwoHandSword->GetCharacterState();
+	OverlapingItem = nullptr;
+	EquipWeapon = OverlappingTwoHandSword;
+	IsEquipedTwoHand = true;
+	IsEquipOneHand = false;
+}
+
+void ASlashCharactere::EquippingOneHandSword(AOneHandedSword*& OverlappingOneHandSword)
+{
+	OverlappingOneHandSword->Equip(GetMesh(), OverlappingOneHandSword->GetSocketName(), this, this);
+	CharacterState = OverlappingOneHandSword->GetCharacterState();
+	OverlapingItem = nullptr;
+	EquipWeapon = OverlappingOneHandSword;
+	IsEquipOneHand = true;
+	IsEquipedTwoHand = false;
+}
+
+void ASlashCharactere::EquipEnd()
+{
+	ActionState = EActionState::EAS_Unoccupied;
+}
+
+void ASlashCharactere::AttacheWeaponToTheBack()
+{
+	if (EquipWeapon)
+	{
+		EquipWeapon->AttachingWeapon(GetMesh(), FName("SpineSocket"));
+	}
+}
+void ASlashCharactere::AttacheWeaponToTheHand()
+{
+	if (IsEquipOneHand && EquipWeapon)
+	{
+		EquipWeapon->AttachingWeapon(GetMesh(), FName("RightHandSocket"));
+	}
+	else if (IsEquipedTwoHand && EquipWeapon)
+	{
+		EquipWeapon->AttachingWeapon(GetMesh(), FName("RightHandTwoHanded"));
+	}
+}
+
+bool ASlashCharactere::IsUnoccupied()
+{
+	return ActionState == EActionState::EAS_Unoccupied;
 }
 
 bool ASlashCharactere::HasEnoughStamina()
@@ -286,137 +413,6 @@ bool ASlashCharactere::CanDisarm()
 		ActionState == EActionState::EAS_Unoccupied;
 }
 
-void ASlashCharactere::Equip()
-{
-	ATwoHandedSword* OverlappingTwoHandSword = Cast<ATwoHandedSword>(OverlapingItem);
-	AOneHandedSword* OverlappingOneHandSword = Cast<AOneHandedSword>(OverlapingItem);
-	
-	if (OverlappingOneHandSword)
-	{
-		if (EquipWeapon)
-		{
-			EquipWeapon->Destroy();
-		}
-		EquippingOneHandSword(OverlappingOneHandSword);
-	}
-	else if (OverlappingTwoHandSword)
-	{
-		if (EquipWeapon)
-		{
-			EquipWeapon->Destroy();
-		}
-		EquippingTwoHandSword(OverlappingTwoHandSword);
-	}
-	else
-	{
-		if (CanDisarm())
-		{
-			if (IsEquipOneHand)
-			{
-				PlayEquipMontage(FName("Unequip"));
-				CharacterState = ECharacterState::ECS_UnEquipped;
-				ActionState = EActionState::EAS_Equiping;
-			}
-			else if (IsEquipedTwoHand)
-			{
-				PlayEquipMontageTwoHand(FName("Unequip"));
-				CharacterState = ECharacterState::ECS_UnEquipped;
-				ActionState = EActionState::EAS_Equiping;
-			}
-		}
-		else if (CanArm())
-		{
-			if (IsEquipOneHand)
-			{
-				PlayEquipMontage(FName("Equip"));
-				CharacterState = ECharacterState::ECS_EquipOneHandWeapon;
-				ActionState = EActionState::EAS_Equiping;
-			}
-			else if(IsEquipedTwoHand)
-			{
-				PlayEquipMontageTwoHand(FName("Equip"));
-				CharacterState = ECharacterState::ECS_EquipTwoHAndWeapon;
-				ActionState = EActionState::EAS_Equiping;
-			}
-		}
-	}
-}
-
-void ASlashCharactere::EquippingTwoHandSword(ATwoHandedSword*& OverlappingTwoHandSword)
-{
-	OverlappingTwoHandSword->Equip(GetMesh(), OverlappingTwoHandSword->GetSocketName(), this, this);
-	CharacterState = OverlappingTwoHandSword->GetCharacterState();
-	OverlapingItem = nullptr;
-	EquipWeapon = OverlappingTwoHandSword;
-	IsEquipedTwoHand = true;
-	IsEquipOneHand = false;
-}
-
-void ASlashCharactere::EquippingOneHandSword(AOneHandedSword*& OverlappingOneHandSword)
-{
-	OverlappingOneHandSword->Equip(GetMesh(), OverlappingOneHandSword->GetSocketName(), this, this);
-	CharacterState = OverlappingOneHandSword->GetCharacterState();
-	OverlapingItem = nullptr;
-	EquipWeapon = OverlappingOneHandSword;
-	IsEquipOneHand = true;
-	IsEquipedTwoHand = false;
-}
-
-void ASlashCharactere::EquipEnd()
-{
-	ActionState = EActionState::EAS_Unoccupied;
-}
-void ASlashCharactere::HitReactEnd()
-{
-	ActionState = EActionState::EAS_Unoccupied;
-}
-
-void ASlashCharactere::AttacheWeaponToTheBack()
-{
-	if (EquipWeapon)
-	{
-		EquipWeapon->AttachingWeapon(GetMesh(), FName("SpineSocket"));
-	}
-}
-
-void ASlashCharactere::AttacheWeaponToTheHand()
-{
-	if (IsEquipOneHand && EquipWeapon)
-	{
-		EquipWeapon->AttachingWeapon(GetMesh(), FName("RightHandSocket"));
-	}
-	else if (IsEquipedTwoHand && EquipWeapon)
-	{
-		EquipWeapon->AttachingWeapon(GetMesh(), FName("RightHandTwoHanded"));
-	}
-}
-
-void ASlashCharactere::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	if (UEnhancedInputComponent* EnhancePlayerComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		//Moving
-		EnhancePlayerComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &ASlashCharactere::Move);
-		
-		//Looking
-		EnhancePlayerComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASlashCharactere::Look);
-
-		//jump
-		EnhancePlayerComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ASlashCharactere::Jump);
-
-		//Equip
-		EnhancePlayerComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ASlashCharactere::Equip);
-	
-		//Attack
-		EnhancePlayerComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ASlashCharactere::Attack);
-		
-		//Dodge
-		EnhancePlayerComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ASlashCharactere::Dodge);
-		}
-}
-
 float ASlashCharactere::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	HandleDamage(DamageAmount);
@@ -441,7 +437,10 @@ void ASlashCharactere::GetHit_Implementation(const FVector& ImpactPoint, AActor*
 	{
 	ActionState = EActionState::EAS_HitReaction;
 	}
-
+}
+void ASlashCharactere::HitReactEnd()
+{
+	ActionState = EActionState::EAS_Unoccupied;
 }
 
 void ASlashCharactere::SetOverlappingItem(AItem* Item)
