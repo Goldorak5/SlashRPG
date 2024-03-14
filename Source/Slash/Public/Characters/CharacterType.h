@@ -42,3 +42,21 @@ enum class EEnemyState : uint8
 	EES_Attacking UMETA(DisplayName = "Attacking"),
 	EES_Engaged UMETA(DisplayName = "Engaged")
 };
+
+UENUM(BlueprintType)
+enum class EItemType : uint8
+{
+	EIT_Weapon UMETA(DisplayName = "Weapon"),
+	EIT_Potion UMETA(DisplayName = "Potion"),
+	EIT_Armor UMETA(DisplayName = "Armor"),
+	EIT_Gold UMETA(DisplayName = "Gold")
+};
+
+UENUM(BlueprintType) 
+enum class EItemRarety : uint8
+{
+	EIR_Normal UMETA(DisplayName = "Normal"),
+	EIR_Rare UMETA(DisplayName = "Rare"),
+	EIR_Mythique UMETA(DisplayName = "Mythique"),
+	EIR_Legendary UMETA(DisplayName = "Legendary")
+};

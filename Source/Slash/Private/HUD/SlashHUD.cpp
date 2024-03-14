@@ -3,6 +3,7 @@
 
 #include "HUD/SlashHUD.h"
 #include "HUD/SlashOverlay.h"
+#include "Hud/InventoryWidget.h"
 
 void ASlashHUD::BeginPlay()
 {
@@ -17,10 +18,12 @@ void ASlashHUD::PreInitializeComponents()
 	if (World)
 	{
 		APlayerController* PlayerController = World->GetFirstPlayerController();
-		if (PlayerController && SlashOverlayClass)
+		if (PlayerController && SlashOverlayClass && InventoryWidgetClass)
 		{
 			SlashOverlay = CreateWidget<USlashOverlay>(PlayerController, SlashOverlayClass);
 			SlashOverlay->AddToViewport();
+// 			InventoryWidget = CreateWidget<UInventoryWidget>(PlayerController, InventoryWidgetClass);
+// 			InventoryWidget->AddToViewport();
 		}
 	}
 }

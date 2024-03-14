@@ -10,6 +10,7 @@ class USphereComponent;
 class UNiagaraComponent;
 class USoundBase;
 class UNiagaraSystem;
+class UWidgetComponent;
 
 enum class EItemState: uint8
 {
@@ -26,6 +27,9 @@ public:
 
 	AItem();
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget")
+	TObjectPtr<UWidgetComponent> NamePlate;
 
 
 protected:
@@ -82,6 +86,8 @@ private:
 	float Runningtime;
 
 	void OveringItem(float Time);
+
+	FVector2D NamePlateVector{ 250.f, 250.f };
 
 };
 

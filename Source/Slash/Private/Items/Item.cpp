@@ -5,6 +5,7 @@
 #include "Slash/DebugMacros.h"
 #include "Components/SphereComponent.h"
 #include "Interfaces/PickUpInterface.h"
+#include "Components/WidgetComponent.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -27,6 +28,12 @@ AItem::AItem()
 	EmbersEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Embers Effects"));
 	EmbersEffect->SetupAttachment(GetRootComponent());
 
+	NamePlate = CreateDefaultSubobject<UWidgetComponent>(TEXT("NamePlate"));
+	NamePlate->SetupAttachment(GetRootComponent());
+	NamePlate->SetWidgetSpace(EWidgetSpace::Screen);
+	NamePlate->SetDrawSize(NamePlateVector);
+	NamePlate->SetDrawAtDesiredSize(false);
+	NamePlate->SetVisibility(false);
 }
 
 void AItem::BeginPlay()

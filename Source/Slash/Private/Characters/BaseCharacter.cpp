@@ -135,8 +135,7 @@ void ABaseCharacter::PlayDodgeMontage()
 	if (Animinstance)
 	{
 		Animinstance->Montage_Play(DodgeMontage);
-	}
-    
+	} 
 }
 
 FVector ABaseCharacter::GetTranslationWarpTarget()
@@ -150,7 +149,6 @@ FVector ABaseCharacter::GetTranslationWarpTarget()
 	TargetToMe *= WarpTargetDistance;
 
 	return CombatTargetLocation + TargetToMe;
-
 }
 
 FVector ABaseCharacter::GetRotationWrapTarget()

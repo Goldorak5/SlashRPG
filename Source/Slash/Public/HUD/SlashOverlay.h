@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -9,9 +8,7 @@
 class UProgressBar;
 class UTextBlock;
 
-/**
- * 
- */
+
 UCLASS()
 class SLASH_API USlashOverlay : public UUserWidget
 {

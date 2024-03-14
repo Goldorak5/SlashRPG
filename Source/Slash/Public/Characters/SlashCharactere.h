@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -35,7 +34,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)override;
-
 	/*<AActor>*/
 
 	/* <I_HitInterface> */
@@ -66,6 +64,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr <UInputMappingContext> SlashContext;
+
+		UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr <UInputMappingContext> InventoryContext;
 
 	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr <UInputAction> MovementAction;

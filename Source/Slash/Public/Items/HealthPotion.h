@@ -6,9 +6,7 @@
 #include "Items/Item.h"
 #include "HealthPotion.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class SLASH_API AHealthPotion : public AItem
 {

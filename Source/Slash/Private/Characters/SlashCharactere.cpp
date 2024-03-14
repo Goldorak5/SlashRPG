@@ -30,7 +30,6 @@ ASlashCharactere::ASlashCharactere()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
-
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 350.f, 0.f);
 
@@ -107,6 +106,7 @@ void ASlashCharactere::AddMappingContext()
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(SlashContext, 0);
+			Subsystem->AddMappingContext(InventoryContext, 1);
 		}
 	}
 }
@@ -134,6 +134,9 @@ void ASlashCharactere::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		
 		//Dodge
 		EnhancePlayerComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ASlashCharactere::Dodge);
+
+// 		//Inventory
+// 		EnhancePlayerComponent->BindAction(InventoryMenu, ETriggerEvent::Triggered, this, &ASlashCharactere::Inventory);
 		}
 }
 
